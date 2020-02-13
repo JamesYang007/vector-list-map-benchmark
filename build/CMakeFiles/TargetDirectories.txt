@@ -1,5 +1,0 @@
-/Users/jhyang/Google Drive (jy2816@columbia.edu)/Columbia/Senior/Spring/C++/vector-list-test/build/CMakeFiles/rebuild_cache.dir
-/Users/jhyang/Google Drive (jy2816@columbia.edu)/Columbia/Senior/Spring/C++/vector-list-test/build/CMakeFiles/edit_cache.dir
-/Users/jhyang/Google Drive (jy2816@columbia.edu)/Columbia/Senior/Spring/C++/vector-list-test/build/src/CMakeFiles/rebuild_cache.dir
-/Users/jhyang/Google Drive (jy2816@columbia.edu)/Columbia/Senior/Spring/C++/vector-list-test/build/src/CMakeFiles/edit_cache.dir
-/Users/jhyang/Google Drive (jy2816@columbia.edu)/Columbia/Senior/Spring/C++/vector-list-test/build/src/CMakeFiles/main.dir
