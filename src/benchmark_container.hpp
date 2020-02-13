@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <type_traits>
+#include <map>
 #include <iostream>
 #include "unique_int_uniform.hpp"
 #include "algorithms.hpp"
@@ -39,11 +40,20 @@ inline void benchmark_container(const std::array<int, N>& seeds,
             // compute average time to ordered_insert over all seeds
             UniqueIntUniform generator(sizes[i], seed);
             generator.generate();
+
             auto time = benchmark(container, generator, 
-                    [](Container& c, typename std::decay<Container>::type::value_type x) {
-                        ordered_insert(c, x);
-                    }
-                    );
+                    [](Container& c, int x) {
+                        // if map<int, int>, then create pair
+                        if constexpr (std::is_same_v<
+                                std::decay_t<Container>, std::map<int, int>
+                                >) {
+                            ordered_insert(c, std::make_pair(x, x));
+                        }
+                        else {
+                            ordered_insert(c, x);
+                        }
+                    });
+
             // sanity-check: container should be of size sizes[i]
             assert(container.size() == sizes[i]);
             ins_avg = compute_avg(counter, ins_avg, time);

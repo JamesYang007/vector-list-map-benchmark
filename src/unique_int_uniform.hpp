@@ -18,11 +18,11 @@ struct UniqueIntUniform
     }
 
     UniqueIntUniform(int size, int seed)
-        : UniqueIntUniform(size, 1, 2 * size, seed)
+        : UniqueIntUniform(size, 1, 10 * size, seed)
     {}
 
     UniqueIntUniform(int size)
-        : UniqueIntUniform(size, 1, 2 * size, -1)
+        : UniqueIntUniform(size, 1, 10 * size, -1)
     {}
 
     void generate()
