@@ -1,5 +1,6 @@
 #pragma once
 #include <iterator>
+#include <map>
 
 namespace vlt {
 
@@ -18,6 +19,16 @@ inline void ordered_insert(Container& container,
     }
     // insert before where it points
     container.insert(it, x);
+}
+
+// Specialization: map<int, int>
+// Simply do insert - no O(n) search
+template <>
+inline void ordered_insert<std::map<int, int>>(
+        std::map<int, int>& container,
+        typename std::map<int, int>::value_type x)
+{
+    container.insert(x);
 }
 
 // Remove x from container.

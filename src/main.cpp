@@ -34,8 +34,7 @@ int main()
         static_cast<int>(1e4), 
         static_cast<int>(5e4),
         static_cast<int>(1e5),
-        static_cast<int>(2e5),
-        static_cast<int>(3e5)
+        static_cast<int>(2e5)
     };
     std::vector<std::vector<double>> result(3);
     benchmark_containers<
