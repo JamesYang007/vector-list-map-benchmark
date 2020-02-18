@@ -12,11 +12,9 @@ namespace vlt {
 template <class Container, size_t N>
 inline void benchmark_container(const std::array<int, N>& seeds,
                          const std::vector<int>& sizes,
-                         std::vector<double>& ins_result,
-                         std::vector<double>& rem_result)
+                         std::vector<double>& result)
 {
-    assert(sizes.size() == ins_result.size());
-    assert(sizes.size() == rem_result.size());
+    assert(sizes.size() == result.size());
 
     auto compute_avg = [](size_t counter, double old_avg, double new_val) 
     {
@@ -27,8 +25,7 @@ inline void benchmark_container(const std::array<int, N>& seeds,
 
         std::cout << "Benchmark Size: " << sizes[i] << std::endl;
 
-        double ins_avg = 0.0;   // average benchmark time (s) over all seeds
-        double rem_avg = 0.0;   // average benchmark time (s) over all seeds
+        double avg = 0.0;   // average benchmark time (s) over all seeds
         size_t counter = 0;
 
         for (auto seed : seeds) {
@@ -38,49 +35,56 @@ inline void benchmark_container(const std::array<int, N>& seeds,
             Container container;
 
             // compute average time to ordered_insert over all seeds
+            
+            // generate uniform int
             UniqueIntUniform generator(sizes[i], seed);
             generator.generate();
 
-            auto time = benchmark(container, generator, 
-                    [](Container& c, int x) {
-                        // if map<int, int>, then create pair
-                        if constexpr (std::is_same_v<
-                                std::decay_t<Container>, std::map<int, int>
-                                >) {
-                            ordered_insert(c, std::make_pair(x, x));
-                        }
-                        else {
-                            ordered_insert(c, x);
-                        }
-                    });
-
-            // sanity-check: container should be of size sizes[i]
-            assert(container.size() == sizes[i]);
-            ins_avg = compute_avg(counter, ins_avg, time);
-
-            // compute average time to remove 
+            // generate indices
             std::default_random_engine gen(seed);
             std::vector<int> permutation;
-            permutation.reserve(container.size());
-            for (size_t i = 0; i < container.size(); ++i) {
-                std::uniform_int_distribution<int> dist(0, container.size() - 1 - i);
+            permutation.reserve(sizes[i]);
+            for (size_t j = 0; j < sizes[i]; ++j) {
+                std::uniform_int_distribution<int> dist(0, sizes[i] - 1 - j);
                 permutation.push_back(dist(gen));
             }
-            time = benchmark(container, permutation,
-                    [](Container& c, size_t x) {
-                        ordered_remove(c, x);
-                    }
-                    );
+
+            auto time = benchmark(
+                    [](Container& c, 
+                       const UniqueIntUniform& generator,
+                       const std::vector<int>& permutation) 
+                    {
+                        // ordered insert
+                        for (auto x : generator) {
+                            // if map<int, int>, then create pair
+                            if constexpr (std::is_same_v<
+                                    std::decay_t<Container>, std::map<int, int>
+                                    >) {
+                                ordered_insert(c, std::make_pair(x, x));
+                            }
+                            else {
+                                ordered_insert(c, x);
+                            }
+                        }
+
+                        // ordered remove
+                        for (auto i : permutation) {
+                            ordered_remove(c, i);
+                        }
+                    },
+                    container, 
+                    generator,
+                    permutation);
+
             // sanity-check: every element must have been removed
             assert(container.size() == 0);
-            rem_avg = compute_avg(counter, rem_avg, time);
+            avg = compute_avg(counter, avg, time);
 
             ++counter;
         }
 
         // update avg result
-        ins_result[i] = ins_avg;
-        rem_result[i] = rem_avg;
+        result[i] = avg;
     } 
 }
 
@@ -88,24 +92,21 @@ inline void benchmark_container(const std::array<int, N>& seeds,
 template <class... Containers, size_t N, size_t... I>
 inline void benchmark_containers(const std::array<int, N>& seeds,
                          const std::vector<int>& sizes,
-                         std::vector<std::vector<double>>& ins_result,
-                         std::vector<std::vector<double>>& rem_result,
+                         std::vector<std::vector<double>>& result,
                          std::index_sequence<I...>)
 {
     static_assert(sizeof...(Containers) == sizeof...(I));
-    (ins_result[I].resize(sizes.size()), ...);
-    (rem_result[I].resize(sizes.size()), ...);
-    (benchmark_container<Containers>(seeds, sizes, ins_result[I], rem_result[I]), ...);
+    (result[I].resize(sizes.size()), ...);
+    (benchmark_container<Containers>(seeds, sizes, result[I]), ...);
 }
 
 // At least one container
 template <class... Containers, size_t N>
 inline void benchmark_containers(const std::array<int, N>& seeds,
                          const std::vector<int>& sizes,
-                         std::vector<std::vector<double>>& ins_result,
-                         std::vector<std::vector<double>>& rem_result)
+                         std::vector<std::vector<double>>& result)
 {
-    benchmark_containers<Containers...>(seeds, sizes, ins_result, rem_result,
+    benchmark_containers<Containers...>(seeds, sizes, result,
             std::make_index_sequence<sizeof...(Containers)>());
 }
 

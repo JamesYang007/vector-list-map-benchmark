@@ -25,29 +25,31 @@ int main()
     using namespace vlt;
     std::array<int, 3> seeds = {10, 310, 212};
     std::vector<int> sizes = {
+        static_cast<int>(1e1), 
+        static_cast<int>(5e1), 
+        static_cast<int>(1e2), 
+        static_cast<int>(5e2), 
         static_cast<int>(1e3), 
-        static_cast<int>(2e3), 
-        static_cast<int>(3e3), 
-        static_cast<int>(4e3), 
-        static_cast<int>(5e3),
-        static_cast<int>(7e3), 
+        static_cast<int>(5e3), 
         static_cast<int>(1e4), 
-        static_cast<int>(2e4),
+        static_cast<int>(5e4),
+        static_cast<int>(1e5),
+        static_cast<int>(2e5),
+        static_cast<int>(3e5)
     };
-    std::vector<std::vector<double>> ins_result(3);
-    std::vector<std::vector<double>> rem_result(3);
+    std::vector<std::vector<double>> result(3);
     benchmark_containers<
         std::map<int, int>,
         std::vector<int>,
         std::list<int>
-            >(seeds, sizes, ins_result, rem_result);
+            >(seeds, sizes, result);
     
-    print(ins_result[0]);
-    print(rem_result[0]);
-    print(ins_result[1]);
-    print(rem_result[1]);
-    print(ins_result[2]);
-    print(rem_result[2]);
+    std::cout << "map: ";
+    print(result[0]);
+    std::cout << "vector: ";
+    print(result[1]);
+    std::cout << "list: ";
+    print(result[2]);
     
     return 0;
 }

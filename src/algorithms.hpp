@@ -13,11 +13,10 @@ inline void ordered_insert(Container& container,
     // find the position before which to insert x 
     for (; it != container.end(); ++it) {
         if (*it > x) {
-            // insert before where it points
-            container.insert(it, x);
-            return;
+            break;
         }
     }
+    // insert before where it points
     container.insert(it, x);
 }
 
