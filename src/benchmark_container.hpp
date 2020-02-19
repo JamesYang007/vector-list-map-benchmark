@@ -3,9 +3,11 @@
 #include <type_traits>
 #include <map>
 #include <iostream>
-#include "unique_int_uniform.hpp"
+#include <unordered_set>
+#include <random>
 #include "algorithms.hpp"
 #include "benchmark.hpp"
+#include "type_traits.hpp"
 
 namespace vlt {
 
@@ -37,11 +39,14 @@ inline void benchmark_container(const std::array<int, N>& seeds,
             // compute average time to ordered_insert over all seeds
             
             // generate uniform int
-            UniqueIntUniform generator(sizes[i], seed);
-            generator.generate();
+            std::unordered_set<int> sample;
+            std::default_random_engine gen(seed);
+            std::uniform_int_distribution<int> dist(0, sizes[i] * 10);
+            while (sample.size() < sizes[i]) {
+                sample.insert(dist(gen));
+            } 
 
             // generate indices
-            std::default_random_engine gen(seed);
             std::vector<int> permutation;
             permutation.reserve(sizes[i]);
             for (size_t j = 0; j < sizes[i]; ++j) {
@@ -51,16 +56,15 @@ inline void benchmark_container(const std::array<int, N>& seeds,
 
             auto time = benchmark(
                     [](Container& c, 
-                       const UniqueIntUniform& generator,
+                       const std::unordered_set<int>& sample,
                        const std::vector<int>& permutation) 
                     {
                         // ordered insert
-                        for (auto x : generator) {
+                        for (auto x : sample) {
                             // if map<int, int>, then create pair
-                            if constexpr (std::is_same_v<
-                                    std::decay_t<Container>, std::map<int, int>
-                                    >) {
-                                ordered_insert(c, std::make_pair(x, x));
+                            if constexpr (is_map_v<std::decay_t<Container>>) {
+                                using pair_t = typename std::decay_t<Container>::value_type;
+                                ordered_insert(c, pair_t(x, x));
                             }
                             else {
                                 ordered_insert(c, x);
@@ -73,7 +77,7 @@ inline void benchmark_container(const std::array<int, N>& seeds,
                         }
                     },
                     container, 
-                    generator,
+                    sample,
                     permutation);
 
             // sanity-check: every element must have been removed

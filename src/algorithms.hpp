@@ -1,14 +1,15 @@
 #pragma once
 #include <iterator>
-#include <map>
+#include "type_traits.hpp"
 
 namespace vlt {
 
 // Inserts x into container such that container is ordered.
 // Algorithm explicitly uses iterators to loop and find the correct position to insert.
 template <class Container>
-inline void ordered_insert(Container& container,
-                    typename std::decay<Container>::type::value_type x)
+inline std::enable_if_t<!is_map_v<std::decay_t<Container>>> 
+ordered_insert(Container& container,
+               typename std::decay<Container>::type::value_type x)
 {
     auto it = container.begin();
     // find the position before which to insert x 
@@ -21,12 +22,12 @@ inline void ordered_insert(Container& container,
     container.insert(it, x);
 }
 
-// Specialization: map<int, int>
+// Specialization: map
 // Simply do insert - no O(n) search
-template <>
-inline void ordered_insert<std::map<int, int>>(
-        std::map<int, int>& container,
-        typename std::map<int, int>::value_type x)
+template <class Container>
+inline std::enable_if_t<is_map_v<std::decay_t<Container>>> 
+ordered_insert(Container& container,
+               typename Container::value_type x)
 {
     container.insert(x);
 }
