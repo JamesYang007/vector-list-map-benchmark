@@ -31,10 +31,11 @@ inline void benchmark_container(const std::array<int, N>& seeds,
         size_t counter = 0;
 
         for (auto seed : seeds) {
+            using container_t = std::decay_t<Container>;
 
             std::cout << "Benchmark Seed: " << seed << std::endl;
 
-            Container container;
+            container_t container;
 
             // compute average time to ordered_insert over all seeds
             
@@ -62,8 +63,8 @@ inline void benchmark_container(const std::array<int, N>& seeds,
                         // ordered insert
                         for (auto x : sample) {
                             // if map<int, int>, then create pair
-                            if constexpr (is_map_v<std::decay_t<Container>>) {
-                                using pair_t = typename std::decay_t<Container>::value_type;
+                            if constexpr (is_map_v<container_t>) {
+                                using pair_t = typename container_t::value_type;
                                 ordered_insert(c, pair_t(x, x));
                             }
                             else {

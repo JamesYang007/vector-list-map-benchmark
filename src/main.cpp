@@ -52,12 +52,12 @@ int main()
         static_cast<int>(5e1), 
         static_cast<int>(1e2), 
         static_cast<int>(5e2), 
-        //static_cast<int>(1e3), 
-        //static_cast<int>(5e3), 
-        //static_cast<int>(1e4), 
-        //static_cast<int>(5e4),
-        //static_cast<int>(1e5),
-        //static_cast<int>(2e5)
+        static_cast<int>(1e3), 
+        static_cast<int>(5e3), 
+        static_cast<int>(1e4), 
+        static_cast<int>(5e4),
+        static_cast<int>(1e5),
+        static_cast<int>(2e5)
     };
 
     // Original benchmark
